@@ -1,0 +1,89 @@
+name: run-tests
+
+on:
+  push:
+    paths:
+      - '**.php'
+      - '.github/workflows/run-tests.yml'
+      - 'phpunit.xml.dist'
+      - 'composer.json'
+  pull_request:
+    paths:
+      - '**.php'
+      - '.github/workflows/run-tests.yml'
+      - 'phpunit.xml.dist'
+      - 'composer.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.4, 8.3]
+        db: [sqlite, mysql, sqlsrv]
+
+    name: P${{ matrix.php }} - ${{ matrix.db }}
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: memorylane
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      sqlsrv:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: MemoryLane!Pass1
+        ports:
+          - 1433:1433
+        options: --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'MemoryLane!Pass1' -Q 'SELECT 1'" --health-interval=10s --health-timeout=5s --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, mbstring, pdo, sqlite, pdo_sqlite, pdo_mysql, sqlsrv, pdo_sqlsrv
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction
+
+      - name: Execute tests (sqlite)
+        if: matrix.db == 'sqlite'
+        run: vendor/bin/pest --ci
+
+      - name: Execute tests (mysql)
+        if: matrix.db == 'mysql'
+        run: vendor/bin/pest --ci
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: memorylane
+          DB_USERNAME: root
+          DB_PASSWORD: ''
+
+      - name: Execute tests (sqlsrv)
+        if: matrix.db == 'sqlsrv'
+        run: vendor/bin/pest --ci
+        env:
+          DB_CONNECTION: sqlsrv
+          DB_HOST: 127.0.0.1
+          DB_PORT: 1433
+          DB_DATABASE: master
+          DB_USERNAME: sa
+          DB_PASSWORD: MemoryLane!Pass1

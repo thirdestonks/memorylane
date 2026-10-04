@@ -1,0 +1,65 @@
+{
+    "name": "thirdestonks/memorylane",
+    "description": "Lightweight, self-hosted, prod-safe request profiler for Laravel: duration, memory, queries and N+1s per request.",
+    "keywords": [
+        "thirdestonks",
+        "laravel",
+        "memorylane",
+        "apm",
+        "profiler",
+        "n+1"
+    ],
+    "homepage": "https://github.com/thirdestonks/memorylane",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "thirdestonks",
+            "email": "aguilerathirde@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "spatie/laravel-package-tools": "^1.16",
+        "illuminate/contracts": "^12.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.14",
+        "nunomaduro/collision": "^8.8",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-arch": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Thirdestonks\\MemoryLane\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Thirdestonks\\MemoryLane\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Thirdestonks\\MemoryLane\\MemoryLaneServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
