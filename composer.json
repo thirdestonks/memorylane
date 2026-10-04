@@ -7,7 +7,7 @@
         "memorylane",
         "apm",
         "profiler",
-        "n+1"
+        "n-plus-one"
     ],
     "homepage": "https://github.com/thirdestonks/memorylane",
     "license": "MIT",
