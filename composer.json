@@ -1,6 +1,6 @@
 {
     "name": "thirdestonks/memorylane",
-    "description": "Lightweight, self-hosted, prod-safe request profiler for Laravel: duration, memory, queries and N+1s per request.",
+    "description": "Lightweight, self-hosted, prod-safe request profiler for Laravel: duration, memory, queries and NPlusOnes per request.",
     "keywords": [
         "thirdestonks",
         "laravel",
